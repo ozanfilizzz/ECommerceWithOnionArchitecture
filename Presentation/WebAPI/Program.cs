@@ -1,10 +1,16 @@
+using Application.ValidationRules.Products;
+using FluentValidation.AspNetCore;
+using Infrastructure.Filters;
 using Persistence.DependencyResolvers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>())
+    .AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<CreateProductValidator>())
+    .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true );
+
 builder.Services.AddPersistenceServices();
 builder.Services.AddCors(options => options.AddDefaultPolicy( policy => policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod()));
 
